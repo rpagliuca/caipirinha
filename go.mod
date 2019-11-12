@@ -1,4 +1,4 @@
-module app
+module github.com/rpagliuca/caipirinha
 
 go 1.12
 
