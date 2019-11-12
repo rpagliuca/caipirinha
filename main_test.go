@@ -33,6 +33,26 @@ func TestPivot(t *testing.T) {
 		{
 			data,
 			[]string {
+				"col1", "col2", "col3",
+			},
+			"quantity",
+			[]map[string]interface{} {
+				{ "col1": "v1", "quantity": 4.0 },
+				{ "col1": "v1", "col2": "v1", "quantity": 1.5 },
+				{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5 },
+				{ "col1": "v1", "col2": "v2", "quantity": 2.5 },
+				{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5 },
+				{ "col1": "v2", "quantity": 11.0 },
+				{ "col1": "v2", "col2": "v2", "quantity": 10.0 },
+				{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5 },
+				{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5 },
+				{ "col1": "v2", "col2": "v3", "quantity": 1.0 },
+				{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0 },
+			},
+		},
+		{
+			data,
+			[]string {
 				"col1",
 			},
 			"quantity",
@@ -53,44 +73,50 @@ func TestPivot(t *testing.T) {
 				{ "col1": "v1", "col2": "v1", "quantity": 2.5 },
 				{ "col1": "v1", "col2": "v2", "quantity": 7.5 },
 			},
-
-			/*
-			c1v1 2.5
-			c2v1 2.5
-
-			c1 10.0
-			c2 7.5 -> "c1v1 2.5 c2v1 2.5"
-
-			c1 nil -> "c1v1 10.0"
-			c2 nil -> "c1v1 10.0 c2v1 7.5"
-			*/
 		},
 
-		//{
-		//	data,
-		//	[]string {
-		//		"col1",
-		//		"col2",
-		//	},
-		//	"quantity",
-		//	[]map[string]interface{} {
-		//		{ "col1": "v1", "col2": "v1", "quantity": 1.5},
-		//		{ "col1": "v1", "col2": "v2", "quantity": 2.5},
-		//		{ "col1": "v1", "quantity": 4.0},
-		//		{ "col1": "v2", "col2": "v2", "quantity": 10.0},
-		//		{ "col1": "v2", "col2": "v3", "quantity": 1.0},
-		//		{ "col1": "v2", "quantity": 11.0},
-		//	},
-		//},
+		{
+			data,
+			[]string {
+				"col1",
+				"col2",
+			},
+			"quantity",
+			[]map[string]interface{} {
+				{ "col1": "v1", "quantity": 4.0},
+				{ "col1": "v1", "col2": "v1", "quantity": 1.5},
+				{ "col1": "v1", "col2": "v2", "quantity": 2.5},
+				{ "col1": "v2", "quantity": 11.0},
+				{ "col1": "v2", "col2": "v2", "quantity": 10.0},
+				{ "col1": "v2", "col2": "v3", "quantity": 1.0},
+			},
+		},
+
+		{
+			data,
+			[]string {
+				"col2",
+				"col1",
+			},
+			"quantity",
+			[]map[string]interface{} {
+				{ "col2": "v1", "quantity": 1.5},
+				{ "col2": "v1", "col1": "v1", "quantity": 1.5},
+				{ "col2": "v2", "quantity": 12.5},
+				{ "col2": "v2", "col1": "v1", "quantity": 2.5},
+				{ "col2": "v2", "col1": "v2", "quantity": 10.0},
+				{ "col2": "v3", "quantity": 1.0},
+				{ "col2": "v3", "col1": "v2", "quantity": 1.0},
+			},
+		},
 	}
 	for i := range testCases {
-		c := testCases[i]
-		pretty.Println("Test case" , i)
-		got := pivot(c.data, c.groupBy, c.accumulator)
-		err := assertSlicesEqual(got, c.expected)
+		tc := testCases[i]
+		got := pivot(tc.data, tc.groupBy, tc.accumulator)
+		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
 			pretty.Println("got", got)
-			pretty.Println("expected", c.expected)
+			pretty.Println("expected", tc.expected)
 			t.Error(fmt.Sprintf("Test case %d: ", i), err.Error())
 			return
 		}
@@ -117,4 +143,67 @@ func assertSlicesEqual(slice1 []map[string]interface{}, slice2 []map[string]inte
 		}
 	}
 	return nil
+}
+
+func TestSort(t *testing.T) {
+	type TestCase struct {
+		data []map[string]interface{}
+		keys []string
+		expected []map[string]interface{}
+	}
+
+	data1 := []map[string]interface{}{
+		{"col1": 1},
+		{"col1": 2},
+		{},
+		{"col1": 0},
+	}
+
+	expected1 := []map[string]interface{}{
+		{},
+		{"col1": 0},
+		{"col1": 1},
+		{"col1": 2},
+	}
+
+	data2 := []map[string]interface{}{
+		{"col1": 1, "col2": 1},
+		{"col1": 2, "col2": 1},
+		{},
+		{"col1": 1},
+		{"col1": 2},
+	}
+
+	expected2a := []map[string]interface{}{
+		{},
+		{"col1": 1},
+		{"col1": 2},
+		{"col1": 2, "col2": 1},
+		{"col1": 1, "col2": 1},
+	}
+
+	expected2b := []map[string]interface{}{
+		{},
+		{"col1": 1},
+		{"col1": 1, "col2": 1},
+		{"col1": 2},
+		{"col1": 2, "col2": 1},
+	}
+
+	testCases := []TestCase {
+		TestCase{data1, []string{"col1"}, expected1},
+		TestCase{data2, []string{"col2"}, expected2a},
+		TestCase{data2, []string{"col1", "col2"}, expected2b},
+	}
+
+	for _, tc := range testCases {
+		sorted := sort(tc.data, tc.keys)
+		got := sorted
+		err := assertSlicesEqual(got, tc.expected)
+		if err != nil {
+			pretty.Println("got", got)
+			pretty.Println("expected", tc.expected)
+			t.Error("Error sorting")
+		}
+	}
 }
