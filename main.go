@@ -1,7 +1,7 @@
 package caipirinha
 
-func pivot(data []map[string]interface{}, groupBy []string, accumulator string) []map[string]interface{} {
-	data = sort(data, groupBy)
+func Pivot(data []map[string]interface{}, groupBy []string, accumulator string) []map[string]interface{} {
+	data = Sort(data, groupBy)
 	out := make([]map[string]interface{}, 0)
 	totals := make(map[int]float64, 0)
 	var previous map[string]interface{}
@@ -28,11 +28,11 @@ func pivot(data []map[string]interface{}, groupBy []string, accumulator string) 
 		}
 		previous = row
 	}
-	out = sort(out, groupBy)
+	out = Sort(out, groupBy)
 	return out
 }
 
-func sort(data []map[string]interface{}, keys []string) []map[string]interface{} {
+func Sort(data []map[string]interface{}, keys []string) []map[string]interface{} {
 	for i := range data {
 		for j := i+1; j < len(data); j++ {
 			var greater bool

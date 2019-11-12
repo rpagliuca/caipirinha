@@ -112,7 +112,7 @@ func TestPivot(t *testing.T) {
 	}
 	for i := range testCases {
 		tc := testCases[i]
-		got := pivot(tc.data, tc.groupBy, tc.accumulator)
+		got := Pivot(tc.data, tc.groupBy, tc.accumulator)
 		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
 			pretty.Println("got", got)
@@ -197,8 +197,7 @@ func TestSort(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		sorted := sort(tc.data, tc.keys)
-		got := sorted
+		got := Sort(tc.data, tc.keys)
 		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
 			pretty.Println("got", got)
