@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 	"errors"
-	"github.com/kr/pretty"
 )
 
 func TestPivot(t *testing.T) {
@@ -115,8 +114,6 @@ func TestPivot(t *testing.T) {
 		got := Pivot(tc.data, tc.groupBy, tc.accumulator)
 		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
-			pretty.Println("got", got)
-			pretty.Println("expected", tc.expected)
 			t.Error(fmt.Sprintf("Test case %d: ", i), err.Error())
 			return
 		}
@@ -200,8 +197,6 @@ func TestSort(t *testing.T) {
 		got := Sort(tc.data, tc.keys)
 		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
-			pretty.Println("got", got)
-			pretty.Println("expected", tc.expected)
 			t.Error("Error sorting")
 		}
 	}
