@@ -10,21 +10,21 @@ func TestPivot(t *testing.T) {
 	type testCase struct {
 		data []map[string]interface{}
 		groupBy []string
-		accumulator string
+		accumulators []string
 		expected []map[string]interface{}
 	}
 
 	data := []map[string]interface{} {
-		{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5 },
-		{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5 },
-		{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5 },
-		{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0 },
-		{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5 },
+		{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5, "other_quantity": 1.0 },
+		{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5, "other_quantity": 2.0 },
+		{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5, "other_quantity": 3.0 },
+		{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0, "other_quantity": 4.0 },
+		{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5, "other_quantity": 5.0 },
 	}
 
 	data2 := []map[string]interface{} {
-		{ "col1": "v1", "col2": "v1", "quantity": 2.5 },
-		{ "col1": "v1", "col2": "v2", "quantity": 7.5 },
+		{ "col1": "v1", "col2": "v1", "quantity": 2.5, "other_quantity": 1.0 },
+		{ "col1": "v1", "col2": "v2", "quantity": 7.5, "other_quantity": 2.0 },
 
 	}
 
@@ -34,19 +34,21 @@ func TestPivot(t *testing.T) {
 			[]string {
 				"col1", "col2", "col3",
 			},
-			"quantity",
+			[]string {
+				"quantity", "other_quantity",
+			},
 			[]map[string]interface{} {
-				{ "col1": "v1", "quantity": 4.0 },
-				{ "col1": "v1", "col2": "v1", "quantity": 1.5 },
-				{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5 },
-				{ "col1": "v1", "col2": "v2", "quantity": 2.5 },
-				{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5 },
-				{ "col1": "v2", "quantity": 11.0 },
-				{ "col1": "v2", "col2": "v2", "quantity": 10.0 },
-				{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5 },
-				{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5 },
-				{ "col1": "v2", "col2": "v3", "quantity": 1.0 },
-				{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0 },
+				{ "col1": "v1", "quantity": 4.0, "other_quantity": 4.0 },
+				{ "col1": "v1", "col2": "v1", "quantity": 1.5, "other_quantity": 3.0 },
+				{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5, "other_quantity": 3.0 },
+				{ "col1": "v1", "col2": "v2", "quantity": 2.5, "other_quantity": 1.0 },
+				{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5, "other_quantity": 1.0 },
+				{ "col1": "v2", "quantity": 11.0, "other_quantity": 11.0},
+				{ "col1": "v2", "col2": "v2", "quantity": 10.0, "other_quantity": 7.0 },
+				{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5, "other_quantity": 5.0 },
+				{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5, "other_quantity": 2.0 },
+				{ "col1": "v2", "col2": "v3", "quantity": 1.0, "other_quantity": 4.0 },
+				{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0, "other_quantity": 4.0 },
 			},
 		},
 		{
@@ -54,7 +56,9 @@ func TestPivot(t *testing.T) {
 			[]string {
 				"col1",
 			},
-			"quantity",
+			[]string {
+				"quantity",
+			},
 			[]map[string]interface{} {
 				{ "col1": "v1", "quantity": 4.0 },
 				{ "col1": "v2", "quantity": 11.0 },
@@ -66,7 +70,9 @@ func TestPivot(t *testing.T) {
 			[]string {
 				"col1", "col2",
 			},
-			"quantity",
+			[]string {
+				"quantity",
+			},
 			[]map[string]interface{} {
 				{ "col1": "v1", "quantity": 10.0 },
 				{ "col1": "v1", "col2": "v1", "quantity": 2.5 },
@@ -80,7 +86,9 @@ func TestPivot(t *testing.T) {
 				"col1",
 				"col2",
 			},
-			"quantity",
+			[]string {
+				"quantity",
+			},
 			[]map[string]interface{} {
 				{ "col1": "v1", "quantity": 4.0},
 				{ "col1": "v1", "col2": "v1", "quantity": 1.5},
@@ -97,7 +105,9 @@ func TestPivot(t *testing.T) {
 				"col2",
 				"col1",
 			},
-			"quantity",
+			[]string {
+				"quantity",
+			},
 			[]map[string]interface{} {
 				{ "col2": "v1", "quantity": 1.5},
 				{ "col2": "v1", "col1": "v1", "quantity": 1.5},
@@ -111,7 +121,7 @@ func TestPivot(t *testing.T) {
 	}
 	for i := range testCases {
 		tc := testCases[i]
-		got := Pivot(tc.data, tc.groupBy, tc.accumulator)
+		got := Pivot(tc.data, tc.groupBy, tc.accumulators)
 		err := assertSlicesEqual(got, tc.expected)
 		if err != nil {
 			t.Error(fmt.Sprintf("Test case %d: ", i), err.Error())

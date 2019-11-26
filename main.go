@@ -1,9 +1,12 @@
 package caipirinha
 
-func Pivot(data []map[string]interface{}, groupBy []string, accumulator string) []map[string]interface{} {
+func Pivot(data []map[string]interface{}, groupBy []string, accumulators []string) []map[string]interface{} {
 	data = Sort(data, groupBy)
 	out := make([]map[string]interface{}, 0)
-	totals := make(map[int]float64, 0)
+	totals := make(map[string]map[int]float64, 0)
+	for _, accumulator := range accumulators {
+		totals[accumulator] = make(map[int]float64, 0)
+	}
 	var previous map[string]interface{}
 	data = append(data, nil)
 	for _, row := range data {
@@ -12,18 +15,24 @@ func Pivot(data []map[string]interface{}, groupBy []string, accumulator string) 
 		for i, group := range groupBy {
 			newRow[group] = previous[group]
 			if previous != nil && (changed || row[group] != previous[group]) {
-				newRow[accumulator] = totals[i]
+				for _, accumulator := range accumulators {
+					newRow[accumulator] = totals[accumulator][i]
+				}
 				out = append(out, newRow)
 				oldRow := newRow
 				newRow = make(map[string]interface{}, 0)
 				for k, v := range oldRow {
 					newRow[k] = v
 				}
-				totals[i] = 0
+				for _, accumulator := range accumulators {
+					totals[accumulator][i] = 0
+				}
 				changed = true
 			}
 			if row != nil {
-				totals[i] += row[accumulator].(float64)
+				for _, accumulator := range accumulators {
+					totals[accumulator][i] += row[accumulator].(float64)
+				}
 			}
 		}
 		previous = row
