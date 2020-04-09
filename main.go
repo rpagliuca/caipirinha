@@ -47,14 +47,38 @@ func Sort(data []map[string]interface{}, keys []string) []map[string]interface{}
 			var greater bool
 			out:
 			for _, key := range keys {
-				if data[i][key] == nil && data[j][key] != nil {
+				_, oki := data[i][key]
+				_, okj := data[j][key]
+				if !oki && okj {
+					// We do not have column in record i, but we have in record j,
+					// so record i cannot be positioned before record j
 					greater = false
 					break out
-				} else if data[i][key] == nil && data[j][key] == nil {
-				} else if data[j][key] == nil {
+				} else if !oki && !okj {
+					// We do not have column in record i, neither record j,
+					// so we cannot infer anything from this column
+					continue
+				} else if oki && !okj {
+					// We have column in record i, but not in record j,
+					// so we are sure that record i should be positioned before record j
 					greater = true
 					break out
 				} else {
+					if data[i][key] == nil && data[j][key] != nil {
+						// Value for column in record i is nil, and in record j is not nil,
+						// so we are sure that record i cannot be positioned before record j
+						greater = false
+						break out
+					} else if data[i][key] == nil && data[j][key] == nil {
+						// Both values are nil,
+						// so we cannot infer anything from this column
+						continue
+					} else if data[i][key] != nil && data[j][key] == nil {
+						// Value for column in record i is not nil, and in record j is nil,
+						// so we are sure that record i should be positioned before record j
+						greater = true
+						break out
+					}
 					switch val := data[i][key].(type) {
 						case string:
 							if val > data[j][key].(string) {

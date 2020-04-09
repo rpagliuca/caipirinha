@@ -130,6 +130,62 @@ func TestPivot(t *testing.T) {
 	}
 }
 
+func TestPivot2(t *testing.T) {
+	type testCase struct {
+		data []map[string]interface{}
+		groupBy []string
+		accumulators []string
+		expected []map[string]interface{}
+	}
+
+	data := []map[string]interface{} {
+		{ "col1": "v1", "col2": nil, "col3": nil, "quantity": 17.0},
+		{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5},
+		{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5},
+		{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5},
+		{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0},
+		{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5},
+	}
+
+	testCases := []testCase {
+		{
+			data,
+			[]string {
+				"col1", "col2", "col3",
+			},
+			[]string {
+				"quantity",
+			},
+			[]map[string]interface{} {
+				{ "col1": "v1", "quantity": 21.0},
+				{ "col1": "v1", "col2": nil, "quantity": 17.0},
+				{ "col1": "v1", "col2": nil, "col3": nil, "quantity": 17.0},
+				{ "col1": "v1", "col2": "v1", "quantity": 1.5},
+				{ "col1": "v1", "col2": "v1", "col3": "v3", "quantity": 1.5},
+				{ "col1": "v1", "col2": "v2", "quantity": 2.5},
+				{ "col1": "v1", "col2": "v2", "col3": "v3", "quantity": 2.5},
+				{ "col1": "v2", "quantity": 11.0},
+				{ "col1": "v2", "col2": "v2", "quantity": 10.0},
+				{ "col1": "v2", "col2": "v2", "col3": "v3", "quantity": 2.5},
+				{ "col1": "v2", "col2": "v2", "col3": "v4", "quantity": 7.5},
+				{ "col1": "v2", "col2": "v3", "quantity": 1.0},
+				{ "col1": "v2", "col2": "v3", "col3": "v4", "quantity": 1.0},
+			},
+		},
+	}
+	for i := range testCases {
+		tc := testCases[i]
+		got := Pivot(tc.data, tc.groupBy, tc.accumulators)
+		err := assertSlicesEqual(got, tc.expected)
+		if err != nil {
+			fmt.Printf("got: %+v\n", got)
+			fmt.Printf("expected: %+v\n", tc.expected)
+			t.Error(fmt.Sprintf("Test case %d: ", i), err.Error())
+			return
+		}
+	}
+}
+
 func assertSlicesEqual(slice1 []map[string]interface{}, slice2 []map[string]interface{}) error {
 	if len(slice1) != len(slice2) {
 		return errors.New(fmt.Sprintf("Length of slice1 (%v) != length of slice 2 (%v)\n", len(slice1), len(slice2)))
